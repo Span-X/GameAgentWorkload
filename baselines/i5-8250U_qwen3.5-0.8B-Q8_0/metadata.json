@@ -1,0 +1,20 @@
+{
+  "cpu": "Intel Core i5-8250U",
+  "backend": "llama.cpp CPU-only",
+  "model": "Qwen3.5-0.8B-Q8_0.gguf",
+  "gpu_layers": 0,
+  "context": 2048,
+  "host_os": "Windows",
+  "awb_source_version": "0.3",
+  "request_selection": {
+    "task_types": [
+      "threat_assessment",
+      "combat_replan",
+      "threat_update"
+    ],
+    "max_requests": 8,
+    "concurrency": 1,
+    "timing_mode": "immediate"
+  },
+  "notes": "First real AWB hardware baseline. llama.cpp exact build/commit and power telemetry were not captured."
+}

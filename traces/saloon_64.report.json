@@ -1,0 +1,84 @@
+{
+  "scenario": "saloon_64",
+  "agents": 64,
+  "peak_active": 24,
+  "peak_cognitive": 24,
+  "requests": 273,
+  "completed": 267,
+  "superseded_before_start": 6,
+  "interrupted_inflight": 0,
+  "deadline_misses": 127,
+  "queue_ms_p50": 234.0,
+  "queue_ms_p95": 2454.199999999999,
+  "queue_ms_p99": 4535.719999999999,
+  "decision_ms_p50": 354.0,
+  "decision_ms_p95": 2576.599999999998,
+  "decision_ms_p99": 5425.08,
+  "service_ms_mean": 131.16479400749063,
+  "carried_state_tokens": 31594,
+  "simulated_cache_reusable_tokens": 0,
+  "interrupted_processed_prefill_tokens": 0,
+  "interrupted_processed_decode_tokens": 0,
+  "belief_updates": 115,
+  "working_memory_updates": 231,
+  "intent_transitions": 79,
+  "plan_transitions": 78,
+  "cognitive_commits": 266,
+  "cognitive_revisions": 0,
+  "preserved_state_components": 0,
+  "invalidated_state_components": 0,
+  "task_breakdown": {
+    "ambient_cognition": {
+      "requests": 176,
+      "completed": 176,
+      "deadline_misses": 58,
+      "carried_state_tokens": 17658,
+      "deadline_miss_rate": 0.32954545454545453
+    },
+    "dialogue": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "carried_state_tokens": 20,
+      "deadline_miss_rate": 0.0
+    },
+    "threat_assessment": {
+      "requests": 18,
+      "completed": 18,
+      "deadline_misses": 9,
+      "carried_state_tokens": 1238,
+      "deadline_miss_rate": 0.5
+    },
+    "combat_replan": {
+      "requests": 48,
+      "completed": 48,
+      "deadline_misses": 48,
+      "carried_state_tokens": 8428,
+      "deadline_miss_rate": 1.0
+    },
+    "assist_target": {
+      "requests": 6,
+      "completed": 0,
+      "deadline_misses": 0,
+      "carried_state_tokens": 634,
+      "deadline_miss_rate": 0.0
+    },
+    "memory_consolidation": {
+      "requests": 12,
+      "completed": 12,
+      "deadline_misses": 0,
+      "carried_state_tokens": 724,
+      "deadline_miss_rate": 0.0
+    },
+    "threat_update": {
+      "requests": 12,
+      "completed": 12,
+      "deadline_misses": 12,
+      "carried_state_tokens": 2892,
+      "deadline_miss_rate": 1.0
+    }
+  },
+  "trace_digest": "4de8be045e96ba32d6f1f88680ff660e14300180b5c4834d7d4f78da95b8d797",
+  "adaptation_rate": 0.02197802197802198,
+  "deadline_miss_rate": 0.4756554307116105
+}

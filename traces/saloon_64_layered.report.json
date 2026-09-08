@@ -1,0 +1,126 @@
+{
+  "scenario": "saloon_64_layered",
+  "agents": 64,
+  "peak_active": 24,
+  "peak_cognitive": 24,
+  "requests": 293,
+  "completed": 289,
+  "superseded_before_start": 1,
+  "interrupted_inflight": 3,
+  "deadline_misses": 1,
+  "queue_ms_p50": 20.0,
+  "queue_ms_p95": 868.8,
+  "queue_ms_p99": 1941.6800000000005,
+  "decision_ms_p50": 86.0,
+  "decision_ms_p95": 1019.7999999999997,
+  "decision_ms_p99": 2574.4800000000005,
+  "service_ms_mean": 78.41176470588235,
+  "carried_state_tokens": 25460,
+  "simulated_cache_reusable_tokens": 0,
+  "interrupted_processed_prefill_tokens": 424,
+  "interrupted_processed_decode_tokens": 0,
+  "belief_updates": 115,
+  "working_memory_updates": 231,
+  "intent_transitions": 30,
+  "plan_transitions": 29,
+  "reflex_actions": 78,
+  "cognitive_commits": 288,
+  "cognitive_revisions": 3,
+  "preserved_state_components": 6,
+  "invalidated_state_components": 6,
+  "task_breakdown": {
+    "ambient_cognition": {
+      "requests": 176,
+      "completed": 176,
+      "deadline_misses": 0,
+      "carried_state_tokens": 13670,
+      "deadline_miss_rate": 0.0
+    },
+    "dialogue": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "carried_state_tokens": 20,
+      "deadline_miss_rate": 0.0
+    },
+    "reactive_threat_gate": {
+      "requests": 18,
+      "completed": 18,
+      "deadline_misses": 0,
+      "carried_state_tokens": 1200,
+      "deadline_miss_rate": 0.0
+    },
+    "threat_assessment": {
+      "requests": 6,
+      "completed": 6,
+      "deadline_misses": 0,
+      "carried_state_tokens": 388,
+      "deadline_miss_rate": 0.0
+    },
+    "reactive_combat_update": {
+      "requests": 48,
+      "completed": 48,
+      "deadline_misses": 1,
+      "carried_state_tokens": 4468,
+      "deadline_miss_rate": 0.020833333333333332
+    },
+    "combat_replan": {
+      "requests": 16,
+      "completed": 16,
+      "deadline_misses": 0,
+      "carried_state_tokens": 2668,
+      "deadline_miss_rate": 0.0
+    },
+    "assist_target": {
+      "requests": 4,
+      "completed": 0,
+      "deadline_misses": 0,
+      "carried_state_tokens": 478,
+      "deadline_miss_rate": 0.0
+    },
+    "memory_consolidation": {
+      "requests": 8,
+      "completed": 8,
+      "deadline_misses": 0,
+      "carried_state_tokens": 584,
+      "deadline_miss_rate": 0.0
+    },
+    "reactive_target_status": {
+      "requests": 12,
+      "completed": 12,
+      "deadline_misses": 0,
+      "carried_state_tokens": 936,
+      "deadline_miss_rate": 0.0
+    },
+    "threat_update": {
+      "requests": 4,
+      "completed": 4,
+      "deadline_misses": 0,
+      "carried_state_tokens": 1048,
+      "deadline_miss_rate": 0.0
+    }
+  },
+  "layer_breakdown": {
+    "cognitive": {
+      "requests": 207,
+      "completed": 203,
+      "deadline_misses": 0,
+      "deadline_miss_rate": 0.0
+    },
+    "reactive": {
+      "requests": 78,
+      "completed": 78,
+      "deadline_misses": 1,
+      "deadline_miss_rate": 0.01282051282051282
+    },
+    "strategic": {
+      "requests": 8,
+      "completed": 8,
+      "deadline_misses": 0,
+      "deadline_miss_rate": 0.0
+    }
+  },
+  "trace_digest": "4049c8b37a71c8dba4208a764698dd487e8e639885eea952c2995c719ee46a99",
+  "adaptation_rate": 0.013651877133105802,
+  "deadline_miss_rate": 0.0034602076124567475
+}

@@ -1,0 +1,39 @@
+name: Scenario proposal
+description: Propose a new game-agent workload scenario
+title: "[Scenario] "
+labels: ["scenario"]
+body:
+  - type: textarea
+    id: archetype
+    attributes:
+      label: Agent archetype and game context
+      description: Open-world NPC, FPS teammate, crowd, RTS agent, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: events
+    attributes:
+      label: World events and observations
+      description: What objectively happens, and what can each agent actually observe?
+    validations:
+      required: true
+  - type: textarea
+    id: workload
+    attributes:
+      label: Workload shape
+      description: Activation, cognition layers, request sizes, bursts, interruption/replanning.
+    validations:
+      required: true
+  - type: textarea
+    id: deadlines
+    attributes:
+      label: Deadline assumptions
+      description: Proposed deadlines and evidence/rationale for them.
+    validations:
+      required: true
+  - type: textarea
+    id: synthetic
+    attributes:
+      label: Synthetic assumptions / limitations
+    validations:
+      required: true

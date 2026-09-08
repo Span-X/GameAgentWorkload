@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: GameAgentWorkload
+type: software
+message: "If you use GameAgentWorkload in research, please cite the repository and the exact commit/trace digest used."
+authors:
+  - name: Span-X
+repository-code: "https://github.com/Span-X/GameAgentWorkload"
+license: Apache-2.0
+version: 0.4.0-alpha

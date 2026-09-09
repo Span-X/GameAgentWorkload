@@ -1,0 +1,38 @@
+name: Hardware result
+description: Submit a reproducible GameAgentWorkload hardware/runtime measurement
+title: "[Hardware] "
+labels: ["hardware-result"]
+body:
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: RTX 4090 24GB / Ryzen 9 ...
+    validations:
+      required: true
+  - type: textarea
+    id: stack
+    attributes:
+      label: Software/runtime stack
+      description: OS, driver/CUDA, backend version/commit, model file/hash.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Exact launch and benchmark commands
+    validations:
+      required: true
+  - type: input
+    id: trace
+    attributes:
+      label: GameAgentWorkload commit + trace digest
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Attach or paste the report/CSV and relevant telemetry.
+    validations:
+      required: true

@@ -1,0 +1,23 @@
+{
+  "backend": "llama.cpp@http://127.0.0.1:8080",
+  "trace": "traces\\saloon_64.trace.jsonl",
+  "requests_selected": 8,
+  "completed": 8,
+  "failed": 0,
+  "concurrency": 1,
+  "timing_mode": "immediate",
+  "cache_prompt": false,
+  "deadline_misses": 8,
+  "client_queue_ms_p50": 46658.43765000045,
+  "client_queue_ms_p95": 91147.77742500055,
+  "wall_ms_p50": 13661.399900000106,
+  "wall_ms_p95": 16726.48155500019,
+  "ttft_ms_p50": 12109.82679999961,
+  "ttft_ms_p95": 15011.882264999986,
+  "prompt_tok_s_mean": 73.04069791948616,
+  "decode_tok_s_mean": 19.183687820689748,
+  "cache_tokens_total": 0,
+  "prompt_tokens_total": 6990,
+  "cache_ratio": 0.0,
+  "deadline_miss_rate": 1.0
+}

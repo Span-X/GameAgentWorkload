@@ -68,3 +68,10 @@ Next implementation target:
 3. open-loop + closed-loop RTX 3090 / 4090 / 5090 comparison;
 4. blind extension cases used to attack the architecture without adding core
    case-specific branches.
+
+## 0.5.0a1 semantic-real addendum
+
+`bedroom-real` is a separate real-model experiment. It does not use `ReferenceDecisionPolicy` for
+action selection. The existing CognitiveInterruptGate and CognitiveBudgetController remain fixed
+oracle-feature controls in this addendum; model-driven interruption and model-driven cognition-depth
+selection are explicitly out of scope.

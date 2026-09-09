@@ -5,11 +5,12 @@ import csv
 import json
 from pathlib import Path
 
+from awb import __version__
 from awb.backends import FakeBackend, LlamaCppBackend
 from awb.metrics import build_report
 from awb.real_replay import run_real_replay
 from awb.replay import request_digest_from_trace
-from awb.tracing import TraceRecorder
+from awb.tracing import TraceRecorder, read_trace
 from awb.world import World
 from scenarios import SCENARIOS
 
@@ -86,7 +87,7 @@ def run_sweep(name: str, seed: int, out_dir: Path, values: list[int], cognitive_
         writer.writeheader()
         writer.writerows(rows)
 
-    print("GameAgentWorkload 0.4-alpha Sweep")
+    print(f"GameAgentWorkload {__version__} Sweep")
     print(f"Scenario: {name}")
     print("Concurrency | Miss% | Queue p95 | Decision p95 | Carried state | Sim cache")
     for r in rows:
@@ -102,8 +103,56 @@ def run_sweep(name: str, seed: int, out_dir: Path, values: list[int], cognitive_
     return path
 
 
+
+def run_bedroom_suite(seed: int, out_dir: Path, concurrency: int) -> Path:
+    names = sorted(name for name in SCENARIOS if name.startswith("bedroom_1_"))
+    rows = []
+    for name in names:
+        trace_path, _, report = run_scenario(
+            name,
+            seed,
+            out_dir,
+            concurrency,
+            cognitive_loop=True,
+            print_report=False,
+        )
+        records = read_trace(trace_path)
+        result = next(r for r in records if r.get("event") == "bedroom_case_result")
+        rows.append(
+            {
+                "scenario": name,
+                "case": result["case"],
+                "passed": result["passed"],
+                "interrupt": result["interrupt"],
+                "cognitive_mode": result["cognitive_mode"],
+                "brain_calls": result["brain_calls"],
+                "action": result["action"],
+                "action_roles": result["action_roles"],
+                "sleep_completed": result["sleep_completed"],
+                "survived": result["survived"],
+                "social_engagement": result["social_engagement"],
+                "requests": report.requests,
+                "deadline_misses": report.deadline_misses,
+                "decision_ms_p95": report.decision_ms_p95,
+                "trace_digest": report.trace_digest,
+            }
+        )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / "bedroom_1.suite.json"
+    path.write_text(json.dumps({"version": __version__, "cases": rows}, indent=2), encoding="utf-8")
+    print(f"GameAgentWorkload {__version__} Bedroom-1 suite")
+    for row in rows:
+        print(
+            f"{row['case']:<16} pass={str(row['passed']):<5} "
+            f"mode={row['cognitive_mode']:<10} brain_calls={row['brain_calls']} "
+            f"p95={row['decision_ms_p95']:.1f}ms"
+        )
+    print(f"Suite JSON: {path}")
+    return path
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="GameAgentWorkload 0.4-alpha research benchmark harness")
+    parser = argparse.ArgumentParser(description=f"GameAgentWorkload {__version__} research benchmark harness")
     sub = parser.add_subparsers(dest="command")
 
     run_p = sub.add_parser("run", help="run a deterministic synthetic benchmark scenario")
@@ -119,6 +168,11 @@ def main() -> None:
     sweep_p.add_argument("--concurrency", default="1,2,3,4,8,16,24,32")
     sweep_p.add_argument("--out", type=Path, default=Path("traces/sweep"))
     sweep_p.add_argument("--no-cognitive-loop", action="store_true")
+
+    bedroom_p = sub.add_parser("bedroom-suite", help="run all Bedroom-1 core cases")
+    bedroom_p.add_argument("--seed", type=int, default=7)
+    bedroom_p.add_argument("--concurrency", type=int, default=1)
+    bedroom_p.add_argument("--out", type=Path, default=Path("traces/bedroom_1"))
 
     replay_p = sub.add_parser("replay", help="inspect the canonical request-stream digest")
     replay_p.add_argument("trace", type=Path)
@@ -170,6 +224,8 @@ def main() -> None:
             values,
             cognitive_loop=not args.no_cognitive_loop,
         )
+    elif args.command == "bedroom-suite":
+        run_bedroom_suite(args.seed, args.out, args.concurrency)
     elif args.command == "replay":
         print(request_digest_from_trace(args.trace))
     elif args.command == "llamacpp-probe":

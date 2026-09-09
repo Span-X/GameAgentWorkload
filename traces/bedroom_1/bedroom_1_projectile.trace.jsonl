@@ -1,0 +1,41 @@
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 0}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "face_bed", "skill": "sleep_at_bed", "time_ms": 0}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 180}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "sit_on_bed", "skill": "sleep_at_bed", "time_ms": 180}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 180}
+{"event": "world_event", "event_type": "bedroom_observation_delta", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 250}
+{"action_ambiguity": 0.24, "agent_id": 0, "attributes": {"confidence": 0.97, "estimated_speed_class": "very_fast", "time_to_contact_ms": 120, "trajectory_relation": "intersects_self"}, "available_actions": ["protect_self", "move_to_cover"], "deadline_ms": 120, "delta_id": "trajectory_change_01", "event": "observation_delta", "goal_relevance": 1.0, "immediate_risk": 1.0, "novelty": 0.12, "perception_boundary": "controlled_structured_observation", "planning_horizon": 0.05, "prediction_error": 0.98, "skill_validity": 0.0, "summary": "fast object trajectory intersects agent body volume", "time_ms": 250, "uncertainty": 0.1}
+{"agent_id": 0, "delta_id": "trajectory_change_01", "event": "cognitive_interrupt_assessed", "gate": "generic_feature_gate_v0.1", "interrupt": true, "reasons": ["prediction_error", "goal_relevant", "risk", "skill_invalidated"], "score": 0.9504, "time_ms": 250}
+{"agent_id": 0, "budget_ms": 105, "complexity_score": 0.1352, "event": "cognitive_budget_assigned", "mode": "emergency", "stages": ["bedroom_emergency_decision"], "time_ms": 250}
+{"agent_id": 0, "event": "skill_paused", "reason": "decision_relevant_deviation", "skill": "sleep_at_bed", "time_ms": 250}
+{"agent_id": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "emergency", "components": {"beliefs": 0, "intent": 0, "plan": 0, "working_memory": 0}, "event": "cognitive_context_built", "request_id": "r00000", "state_fingerprint": "d8007820b6848d47", "time_ms": 250}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "emergency", "cognitive_revision": 0, "continuation_of": null, "deadline_ms": 105, "event": "inference_request", "expected_output_tokens": 2, "fresh_input_tokens": 96, "input_tokens": 96, "priority": 100, "request_id": "r00000", "state_fingerprint": "d8007820b6848d47", "target_id": null, "task_type": "bedroom_emergency_decision", "time_ms": 250, "world_version": 0}
+{"agent_id": 0, "case_agnostic_contract": true, "event": "brain_call_dispatched", "mode": "emergency", "request_id": "r00000", "stage": "bedroom_emergency_decision", "time_ms": 250}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "event": "inference_started", "fresh_input_tokens": 96, "request_id": "r00000", "service_ms": 9, "time_ms": 250, "worker_id": 0}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 250}
+{"agent_id": 0, "event": "inference_finished", "output_tokens": 2, "request_id": "r00000", "time_ms": 259}
+{"agent_id": 0, "belief_count": 0, "cognitive_domain": "bedroom_decision", "event": "cognitive_state_committed", "intent": null, "intent_status": null, "plan": null, "plan_status": null, "request_id": "r00000", "revision": 1, "time_ms": 259, "working_memory_items": 0}
+{"agent_id": 0, "event": "cognitive_stage_completed", "mode": "emergency", "request_id": "r00000", "stage": "bedroom_emergency_decision", "time_ms": 259}
+{"action": "protect_self", "action_roles": ["protective"], "agent_id": 0, "event": "decision_committed", "mode": "emergency", "policy": "deterministic_reference_policy_not_benchmark_truth", "time_ms": 259}
+{"action": "protect_self", "agent_id": 0, "event": "action_executed", "roles": ["protective"], "time_ms": 259}
+{"event": "world_event", "event_type": "bedroom_hazard_deadline", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 370}
+{"agent_id": 0, "event": "hazard_resolved", "protected_before_deadline": true, "result": "survived", "time_ms": 370}
+{"agent_id": 0, "event": "skill_resumed", "reason": "immediate_hazard_passed", "skill": "sleep_at_bed", "time_ms": 370}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 370}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 380}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "lie_down", "skill": "sleep_at_bed", "time_ms": 380}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 380}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 450}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "lie_down", "skill": "sleep_at_bed", "time_ms": 450}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 450}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 640}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "sleep", "skill": "sleep_at_bed", "time_ms": 640}
+{"agent_id": 0, "event": "skill_completed", "goal": "sleep", "skill": "sleep_at_bed", "time_ms": 640}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 640}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 710}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 710}
+{"event": "world_event", "event_type": "bedroom_finalize", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 3500}
+{"action": "protect_self", "action_roles": ["protective"], "brain_calls": 1, "case": "projectile", "cognitive_mode": "emergency", "event": "bedroom_case_result", "interrupt": true, "passed": true, "sleep_completed": true, "social_engagement": false, "survived": true, "time_ms": 3500, "violations": []}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 3500}

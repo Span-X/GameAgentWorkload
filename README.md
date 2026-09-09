@@ -24,7 +24,7 @@ GameAgentWorkload makes those pressures explicit and records them as replayable 
 
 ## Current status
 
-**Public research preview — v0.4 alpha.**
+**Public research preview — v0.5 alpha (Bedroom-1 experimental branch candidate).**
 
 Implemented today:
 
@@ -40,7 +40,7 @@ Implemented today:
 - real `llama.cpp` replay with exact token-count prompts;
 - deadline decomposition: queue-induced vs intrinsic service misses;
 - first real CPU baseline: i5-8250U + Qwen3.5-0.8B Q8_0, CPU-only;
-- 17 automated tests.
+- 17 original automated tests plus Bedroom-1 cognition/extension regressions.
 
 Not implemented yet:
 
@@ -79,6 +79,18 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current design boundari
 
 ## Scenarios
 
+
+### `bedroom_1_*`
+
+The v0.5 Bedroom-1 family deliberately shrinks the world to one NPC beside one bed.
+It studies whether automatic skill execution should continue or be interrupted under
+four controlled deviations: normal sleep, a goal-surface obstruction, an imminent
+projectile, and a consequential social interruption. The runtime separates
+**interrupt justification** from **cognitive budget/depth** and evaluates behavioral
+envelopes rather than one scripted action.
+
+See [docs/BEDROOM_1_EXPERIMENTAL_CONTRACT.md](docs/BEDROOM_1_EXPERIMENTAL_CONTRACT.md).
+
 ### `saloon_64`
 
 Historical baseline used to expose burst scheduling, interruption, and deadline behavior.
@@ -94,7 +106,16 @@ The current saloon scenario is only a compact stress case. The long-term goal is
 Requires **Python 3.11+**. Synthetic runs use only the Python standard library.
 
 ```bash
+python run.py run --scenario bedroom_1_roach --seed 7 --concurrency 1
+
+# or the older layered stress scenario
 python run.py run --scenario saloon_64_layered --seed 7 --concurrency 4
+```
+
+Run the complete Bedroom-1 core suite:
+
+```bash
+python run.py bedroom-suite --concurrency 1
 ```
 
 Run the historical scenario:
@@ -113,7 +134,7 @@ python -m pytest -q
 Expected at this revision:
 
 ```text
-17 passed
+23 passed
 ```
 
 ## Real llama.cpp replay

@@ -1,0 +1,64 @@
+{
+  "scenario": "bedroom_1_complex_visitor",
+  "agents": 1,
+  "peak_active": 0,
+  "peak_cognitive": 0,
+  "requests": 2,
+  "completed": 2,
+  "superseded_before_start": 0,
+  "interrupted_inflight": 0,
+  "deadline_misses": 0,
+  "queue_ms_p50": 0.0,
+  "queue_ms_p95": 0.0,
+  "queue_ms_p99": 0.0,
+  "decision_ms_p50": 149.5,
+  "decision_ms_p95": 262.45,
+  "decision_ms_p99": 272.49,
+  "service_ms_mean": 149.5,
+  "carried_state_tokens": 0,
+  "simulated_cache_reusable_tokens": 0,
+  "interrupted_processed_prefill_tokens": 0,
+  "interrupted_processed_decode_tokens": 0,
+  "belief_updates": 0,
+  "working_memory_updates": 0,
+  "intent_transitions": 0,
+  "plan_transitions": 0,
+  "reflex_actions": 0,
+  "cognitive_commits": 2,
+  "cognitive_revisions": 0,
+  "preserved_state_components": 0,
+  "invalidated_state_components": 0,
+  "task_breakdown": {
+    "bedroom_fast_triage": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "carried_state_tokens": 0,
+      "deadline_miss_rate": 0.0
+    },
+    "bedroom_deliberation": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "carried_state_tokens": 0,
+      "deadline_miss_rate": 0.0
+    }
+  },
+  "layer_breakdown": {
+    "fast": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "deadline_miss_rate": 0.0
+    },
+    "deliberate": {
+      "requests": 1,
+      "completed": 1,
+      "deadline_misses": 0,
+      "deadline_miss_rate": 0.0
+    }
+  },
+  "trace_digest": "75c6d5d1fc75a7f6d309669294421aedcedbcbfed4d7d511c00214f791ab41a8",
+  "adaptation_rate": 0.0,
+  "deadline_miss_rate": 0.0
+}

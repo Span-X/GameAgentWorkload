@@ -49,6 +49,7 @@ class World:
         self._request_sequence = 0
         self.enable_cognitive_loop = enable_cognitive_loop
         self.simulation_end_ms: int | None = None
+        self._inference_completion_listeners: list = []
         self.scheduler = InferenceScheduler(
             backend,
             trace,
@@ -59,6 +60,10 @@ class World:
 
     def set_simulation_end(self, end_ms: int) -> None:
         self.simulation_end_ms = int(end_ms)
+
+    def add_inference_completion_listener(self, listener) -> None:
+        """Register a scenario/runtime listener without replacing core cognition hooks."""
+        self._inference_completion_listeners.append(listener)
 
     def add_agent(self, agent: AgentState) -> None:
         self.agents[agent.agent_id] = agent
@@ -499,6 +504,8 @@ class World:
             plan=None if state.plan is None else state.plan.goal,
             plan_status=None if state.plan is None else state.plan.status,
         )
+        for listener in tuple(self._inference_completion_listeners):
+            listener(req, now_ms)
 
     def _on_inference_interrupted(
         self,

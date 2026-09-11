@@ -1,0 +1,79 @@
+{
+  "version": "0.5.0a5",
+  "cases": [
+    {
+      "scenario": "bedroom_1_complex_visitor",
+      "case": "complex_visitor",
+      "passed": true,
+      "interrupt": true,
+      "cognitive_mode": "deliberate",
+      "brain_calls": 2,
+      "action": "engage_socially",
+      "action_roles": [
+        "social_engagement"
+      ],
+      "sleep_completed": false,
+      "survived": true,
+      "social_engagement": true,
+      "requests": 2,
+      "deadline_misses": 0,
+      "decision_ms_p95": 262.45,
+      "trace_digest": "75c6d5d1fc75a7f6d309669294421aedcedbcbfed4d7d511c00214f791ab41a8"
+    },
+    {
+      "scenario": "bedroom_1_normal",
+      "case": "normal",
+      "passed": true,
+      "interrupt": false,
+      "cognitive_mode": "automatic",
+      "brain_calls": 0,
+      "action": null,
+      "action_roles": [],
+      "sleep_completed": true,
+      "survived": true,
+      "social_engagement": false,
+      "requests": 0,
+      "deadline_misses": 0,
+      "decision_ms_p95": 0.0,
+      "trace_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "scenario": "bedroom_1_projectile",
+      "case": "projectile",
+      "passed": true,
+      "interrupt": true,
+      "cognitive_mode": "emergency",
+      "brain_calls": 1,
+      "action": "protect_self",
+      "action_roles": [
+        "protective"
+      ],
+      "sleep_completed": true,
+      "survived": true,
+      "social_engagement": false,
+      "requests": 1,
+      "deadline_misses": 0,
+      "decision_ms_p95": 9.0,
+      "trace_digest": "4d8222386961a8c584658a88652fc913f1b46a3b1e4e121531ade3151ba2c925"
+    },
+    {
+      "scenario": "bedroom_1_roach",
+      "case": "roach",
+      "passed": true,
+      "interrupt": true,
+      "cognitive_mode": "fast",
+      "brain_calls": 1,
+      "action": "clear_sleep_surface",
+      "action_roles": [
+        "restore_precondition"
+      ],
+      "sleep_completed": true,
+      "survived": true,
+      "social_engagement": false,
+      "requests": 1,
+      "deadline_misses": 0,
+      "decision_ms_p95": 24.0,
+      "trace_digest": "cacb06afb184986d0c02fe38eeab1bafbde5177c1cee32e56a7976cb3da48f84"
+    }
+  ]
+}

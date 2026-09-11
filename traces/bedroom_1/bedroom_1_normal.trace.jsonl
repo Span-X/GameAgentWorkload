@@ -1,0 +1,17 @@
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 0}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "face_bed", "skill": "sleep_at_bed", "time_ms": 0}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 180}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "sit_on_bed", "skill": "sleep_at_bed", "time_ms": 180}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 180}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 380}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "lie_down", "skill": "sleep_at_bed", "time_ms": 380}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 380}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 640}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "sleep", "skill": "sleep_at_bed", "time_ms": 640}
+{"agent_id": 0, "event": "skill_completed", "goal": "sleep", "skill": "sleep_at_bed", "time_ms": 640}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 640}
+{"event": "world_event", "event_type": "bedroom_finalize", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 3500}
+{"action": null, "action_roles": [], "brain_calls": 0, "case": "normal", "cognitive_mode": "automatic", "event": "bedroom_case_result", "interrupt": false, "passed": true, "sleep_completed": true, "social_engagement": false, "survived": true, "time_ms": 3500, "violations": []}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 3500}

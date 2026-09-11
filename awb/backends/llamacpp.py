@@ -191,6 +191,100 @@ class LlamaCppBackend:
             "stop_type": final_payload.get("stop_type") if isinstance(final_payload, dict) else None,
         }
 
+
+    def stream_chat_completion(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        max_tokens: int = 16,
+    ) -> dict[str, Any]:
+        """Run a real semantic decision through llama.cpp's OpenAI chat API.
+
+        Unlike trace replay, this sends the actual game observation text so the
+        model itself must choose an action.  Wall/TTFT are measured client-side
+        and therefore include real hardware/runtime behavior.
+        """
+
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": 0.0,
+            "max_tokens": max(1, int(max_tokens)),
+            "stream": True,
+            "seed": 1,
+        }
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            self._url("/v1/chat/completions"),
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+
+        wall_start = time.perf_counter()
+        first_token_at: float | None = None
+        content_parts: list[str] = []
+        reasoning_parts: list[str] = []
+        finish_reason: str | None = None
+        usage: dict[str, Any] = {}
+
+        with self._opener.open(req, timeout=self.timeout_seconds) as response:
+            for raw_line in response:
+                line = raw_line.decode("utf-8", errors="replace").strip()
+                if not line.startswith("data:"):
+                    continue
+                data = line[5:].strip()
+                if not data or data == "[DONE]":
+                    continue
+                try:
+                    event = json.loads(data)
+                except json.JSONDecodeError:
+                    continue
+
+                if isinstance(event.get("usage"), dict):
+                    usage = event["usage"]
+                choices = event.get("choices") or []
+                if not choices:
+                    continue
+                choice = choices[0] or {}
+                delta = choice.get("delta") or {}
+                content = delta.get("content")
+                reasoning = (
+                    delta.get("reasoning_content")
+                    or delta.get("reasoning")
+                    or delta.get("analysis")
+                )
+                if content not in (None, ""):
+                    if first_token_at is None:
+                        first_token_at = time.perf_counter()
+                    content_parts.append(str(content))
+                if reasoning not in (None, ""):
+                    if first_token_at is None:
+                        first_token_at = time.perf_counter()
+                    reasoning_parts.append(str(reasoning))
+                if choice.get("finish_reason") is not None:
+                    finish_reason = str(choice["finish_reason"])
+
+        wall_end = time.perf_counter()
+        if first_token_at is None:
+            first_token_at = wall_end
+
+        prompt_tokens = usage.get("prompt_tokens")
+        completion_tokens = usage.get("completion_tokens")
+        return {
+            "text": "".join(content_parts),
+            "reasoning_text": "".join(reasoning_parts),
+            "wall_ms": (wall_end - wall_start) * 1000.0,
+            "ttft_ms": (first_token_at - wall_start) * 1000.0,
+            "prompt_tokens": int(prompt_tokens) if prompt_tokens is not None else None,
+            "completion_tokens": int(completion_tokens) if completion_tokens is not None else None,
+            "finish_reason": finish_reason,
+        }
+
     def probe(self, record: dict | None = None) -> dict[str, Any]:
         record = record or {
             "agent_id": 1,

@@ -24,7 +24,7 @@ GameAgentWorkload makes those pressures explicit and records them as replayable 
 
 ## Current status
 
-**Public research preview — v0.4 alpha.**
+**Public research preview — v0.5 alpha (Bedroom-1 experimental branch candidate).**
 
 Implemented today:
 
@@ -40,7 +40,7 @@ Implemented today:
 - real `llama.cpp` replay with exact token-count prompts;
 - deadline decomposition: queue-induced vs intrinsic service misses;
 - first real CPU baseline: i5-8250U + Qwen3.5-0.8B Q8_0, CPU-only;
-- 17 automated tests.
+- 17 original automated tests plus Bedroom-1 cognition/extension regressions.
 
 Not implemented yet:
 
@@ -79,6 +79,18 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current design boundari
 
 ## Scenarios
 
+
+### `bedroom_1_*`
+
+The v0.5 Bedroom-1 family deliberately shrinks the world to one NPC beside one bed.
+It studies whether automatic skill execution should continue or be interrupted under
+four controlled deviations: normal sleep, a goal-surface obstruction, an imminent
+projectile, and a consequential social interruption. The runtime separates
+**interrupt justification** from **cognitive budget/depth** and evaluates behavioral
+envelopes rather than one scripted action.
+
+See [docs/BEDROOM_1_EXPERIMENTAL_CONTRACT.md](docs/BEDROOM_1_EXPERIMENTAL_CONTRACT.md).
+
 ### `saloon_64`
 
 Historical baseline used to expose burst scheduling, interruption, and deadline behavior.
@@ -94,8 +106,30 @@ The current saloon scenario is only a compact stress case. The long-term goal is
 Requires **Python 3.11+**. Synthetic runs use only the Python standard library.
 
 ```bash
+python run.py run --scenario bedroom_1_roach --seed 7 --concurrency 1
+
+# or the older layered stress scenario
 python run.py run --scenario saloon_64_layered --seed 7 --concurrency 4
 ```
+
+Run the complete Bedroom-1 core suite:
+
+```bash
+python run.py bedroom-suite --concurrency 1
+```
+
+Run the v0.5.0a5 direct-SLM path with runtime-derived affordance state and exception-only precondition projection (no oracle Gate/Budget Controller):
+
+```bash
+python run.py bedroom-direct-real \
+  --base-url http://127.0.0.1:8080 \
+  --model local-model \
+  --cases normal,roach,projectile,complex_visitor \
+  --runs 5 --max-tokens 8 --concurrency 1 \
+  --warmup 1 --warmup-case roach
+```
+
+See [docs/BEDROOM_1_DIRECT_SLM_CROSSOVER_V0_1.md](docs/BEDROOM_1_DIRECT_SLM_CROSSOVER_V0_1.md) and [docs/BEDROOM_1_AFFORDANCE_PRECONDITION_STATE_V0_1.md](docs/BEDROOM_1_AFFORDANCE_PRECONDITION_STATE_V0_1.md).
 
 Run the historical scenario:
 
@@ -113,7 +147,7 @@ python -m pytest -q
 Expected at this revision:
 
 ```text
-17 passed
+52 passed
 ```
 
 ## Real llama.cpp replay
@@ -211,3 +245,19 @@ run.py                 CLI entry point
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
+
+### Current research transition
+
+The Bedroom-1 line has moved from synthetic cognition-mode probes toward real small-model direct control. The current source snapshot (`0.5.0a5`) keeps runtime-derived affordance/precondition state and exposes only decision-relevant exceptions to the direct controller. See `docs/history/BEDROOM_1_RESEARCH_RESULTS_THROUGH_A5.md` and `docs/research/METACONTROL_COMPETING_ARCHITECTURES.md`.
+
+| Stage | Research question | Observed result | Interpretation |
+|---|---|---|---|
+| a1 | Can a real SLM choose executable actions? | Semantically viable; unbounded reasoning broke hard-deadline behavior | Action quality and stopping protocol must be measured separately |
+| a2 | Can one prompted classifier replace meta-control? | Urgency, importance, and deliberation demand were conflated | A four-way prompt label is not yet a convincing gate |
+| a3 | Can an always-on 0.8B controller meet the hot path? | Fast on RTX 6000 Ada; missed a subtle bed obstruction | Latency was promising; raw state representation was insufficient |
+| a4 | Do explicit affordance preconditions fix subtle changes? | Obstruction recovered; social interruption regressed | Full nominal state introduced a competing bias |
+| a5 | Does exception-only projection reduce that bias? | Normal, obstruction, and social cases recovered; projectile requested infeasible escalation | Semantic choice and deterministic admission should remain separate |
+
+These are bounded observations from the documented setup, not universal architecture rankings. Reproduction conditions and failures are retained in the research notes.
+
+The next designed phase is a minimal playable persistent-NPC loop: one room, one NPC, continuous Behavior Tree/skill execution, player-driven world events, perception-bounded AI decisions, deterministic runtime admission, and replayable episode traces. See `docs/design/PLAYABLE_PERSISTENT_NPC_LOOP_V0_6.md`. This design is not yet claimed as implemented.

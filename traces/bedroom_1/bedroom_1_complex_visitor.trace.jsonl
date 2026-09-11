@@ -1,0 +1,36 @@
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 0}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "face_bed", "skill": "sleep_at_bed", "time_ms": 0}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 180}
+{"agent_id": 0, "event": "skill_step", "execution_mode": "automatic_skill_runtime", "phase": "sit_on_bed", "skill": "sleep_at_bed", "time_ms": 180}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 180}
+{"event": "world_event", "event_type": "bedroom_observation_delta", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 250}
+{"action_ambiguity": 0.92, "agent_id": 0, "attributes": {"future_consequences": "material", "interaction": "discussion_requested", "relation": "trusted_person", "stakes": "high"}, "available_actions": ["engage_socially", "defer_interaction", "continue_sleep_skill"], "deadline_ms": null, "delta_id": "social_change_01", "event": "observation_delta", "goal_relevance": 0.82, "immediate_risk": 0.04, "novelty": 0.22, "perception_boundary": "controlled_structured_observation", "planning_horizon": 0.9, "prediction_error": 0.72, "skill_validity": 0.52, "summary": "trusted person initiates consequential ambiguous interaction", "time_ms": 250, "uncertainty": 0.86}
+{"agent_id": 0, "delta_id": "social_change_01", "event": "cognitive_interrupt_assessed", "gate": "generic_feature_gate_v0.1", "interrupt": true, "reasons": ["prediction_error", "goal_relevant"], "score": 0.5058, "time_ms": 250}
+{"agent_id": 0, "budget_ms": 2700, "complexity_score": 0.812, "event": "cognitive_budget_assigned", "mode": "deliberate", "stages": ["bedroom_fast_triage", "bedroom_deliberation"], "time_ms": 250}
+{"agent_id": 0, "event": "skill_paused", "reason": "decision_relevant_deviation", "skill": "sleep_at_bed", "time_ms": 250}
+{"agent_id": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "fast", "components": {"beliefs": 0, "intent": 0, "plan": 0, "working_memory": 0}, "event": "cognitive_context_built", "request_id": "r00000", "state_fingerprint": "d8007820b6848d47", "time_ms": 250}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "fast", "cognitive_revision": 0, "continuation_of": null, "deadline_ms": 300, "event": "inference_request", "expected_output_tokens": 8, "fresh_input_tokens": 256, "input_tokens": 256, "priority": 60, "request_id": "r00000", "state_fingerprint": "d8007820b6848d47", "target_id": null, "task_type": "bedroom_fast_triage", "time_ms": 250, "world_version": 0}
+{"agent_id": 0, "case_agnostic_contract": true, "event": "brain_call_dispatched", "mode": "deliberate", "request_id": "r00000", "stage": "bedroom_fast_triage", "time_ms": 250}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "event": "inference_started", "fresh_input_tokens": 256, "request_id": "r00000", "service_ms": 24, "time_ms": 250, "worker_id": 0}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 250}
+{"agent_id": 0, "event": "inference_finished", "output_tokens": 8, "request_id": "r00000", "time_ms": 274}
+{"agent_id": 0, "belief_count": 0, "cognitive_domain": "bedroom_decision", "event": "cognitive_state_committed", "intent": null, "intent_status": null, "plan": null, "plan_status": null, "request_id": "r00000", "revision": 1, "time_ms": 274, "working_memory_items": 0}
+{"agent_id": 0, "event": "cognitive_stage_completed", "mode": "deliberate", "request_id": "r00000", "stage": "bedroom_fast_triage", "time_ms": 274}
+{"agent_id": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "deliberate", "components": {"beliefs": 0, "intent": 0, "plan": 0, "working_memory": 0}, "event": "cognitive_context_built", "request_id": "r00001", "state_fingerprint": "d8007820b6848d47", "time_ms": 274}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "cognitive_domain": "bedroom_decision", "cognitive_layer": "deliberate", "cognitive_revision": 1, "continuation_of": "r00000", "deadline_ms": 2700, "event": "inference_request", "expected_output_tokens": 74, "fresh_input_tokens": 1184, "input_tokens": 1184, "priority": 60, "request_id": "r00001", "state_fingerprint": "d8007820b6848d47", "target_id": null, "task_type": "bedroom_deliberation", "time_ms": 274, "world_version": 0}
+{"agent_id": 0, "case_agnostic_contract": true, "event": "brain_call_dispatched", "mode": "deliberate", "request_id": "r00001", "stage": "bedroom_deliberation", "time_ms": 274}
+{"agent_id": 0, "cache_reusable_tokens": 0, "carried_state_tokens": 0, "event": "inference_started", "fresh_input_tokens": 1184, "request_id": "r00001", "service_ms": 275, "time_ms": 274, "worker_id": 0}
+{"event": "world_event", "event_type": "bedroom_skill_step", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 380}
+{"agent_id": 0, "event": "skill_step_deferred", "phase": "lie_down", "reason": "cognitive_interrupt", "skill": "sleep_at_bed", "time_ms": 380}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 380}
+{"agent_id": 0, "event": "inference_finished", "output_tokens": 74, "request_id": "r00001", "time_ms": 549}
+{"agent_id": 0, "belief_count": 0, "cognitive_domain": "bedroom_decision", "event": "cognitive_state_committed", "intent": null, "intent_status": null, "plan": null, "plan_status": null, "request_id": "r00001", "revision": 2, "time_ms": 549, "working_memory_items": 0}
+{"agent_id": 0, "event": "cognitive_stage_completed", "mode": "deliberate", "request_id": "r00001", "stage": "bedroom_deliberation", "time_ms": 549}
+{"action": "engage_socially", "action_roles": ["social_engagement"], "agent_id": 0, "event": "decision_committed", "mode": "deliberate", "policy": "deterministic_reference_policy_not_benchmark_truth", "time_ms": 549}
+{"action": "engage_socially", "agent_id": 0, "event": "action_executed", "roles": ["social_engagement"], "time_ms": 549}
+{"agent_id": 0, "event": "goal_suspended", "goal": "sleep", "reason": "social_engagement", "time_ms": 549}
+{"event": "world_event", "event_type": "bedroom_finalize", "location_id": 101, "source_id": null, "target_id": 0, "time_ms": 3500}
+{"action": "engage_socially", "action_roles": ["social_engagement"], "brain_calls": 2, "case": "complex_visitor", "cognitive_mode": "deliberate", "event": "bedroom_case_result", "interrupt": true, "passed": true, "sleep_completed": false, "social_engagement": true, "survived": true, "time_ms": 3500, "violations": []}
+{"active": 0, "background": 1, "cognitive": 0, "dormant": 0, "event": "activation_snapshot", "interactive": 0, "time_ms": 3500}

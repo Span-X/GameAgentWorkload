@@ -3,15 +3,21 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from awb.backends import FakeBackend, LlamaCppBackend
+from awb import __version__
+from awb.backends import FakeBackend, LlamaCppBackend, LlamaCppSemanticDecisionBackend
 from awb.metrics import build_report
 from awb.real_replay import run_real_replay
 from awb.replay import request_digest_from_trace
-from awb.tracing import TraceRecorder
+from awb.semantic_decision import run_semantic_case, write_semantic_report
+from awb.direct_control import run_direct_control_case, write_direct_control_report
+from awb.semantic_gate import run_semantic_gate_case, write_semantic_gate_report
+from awb.tracing import TraceRecorder, read_trace
 from awb.world import World
 from scenarios import SCENARIOS
+from scenarios.bedroom_1 import core_cases
 
 
 def run_scenario(
@@ -86,7 +92,7 @@ def run_sweep(name: str, seed: int, out_dir: Path, values: list[int], cognitive_
         writer.writeheader()
         writer.writerows(rows)
 
-    print("GameAgentWorkload 0.4-alpha Sweep")
+    print(f"GameAgentWorkload {__version__} Sweep")
     print(f"Scenario: {name}")
     print("Concurrency | Miss% | Queue p95 | Decision p95 | Carried state | Sim cache")
     for r in rows:
@@ -102,8 +108,279 @@ def run_sweep(name: str, seed: int, out_dir: Path, values: list[int], cognitive_
     return path
 
 
+
+def run_bedroom_suite(seed: int, out_dir: Path, concurrency: int) -> Path:
+    names = sorted(name for name in SCENARIOS if name.startswith("bedroom_1_"))
+    rows = []
+    for name in names:
+        trace_path, _, report = run_scenario(
+            name,
+            seed,
+            out_dir,
+            concurrency,
+            cognitive_loop=True,
+            print_report=False,
+        )
+        records = read_trace(trace_path)
+        result = next(r for r in records if r.get("event") == "bedroom_case_result")
+        rows.append(
+            {
+                "scenario": name,
+                "case": result["case"],
+                "passed": result["passed"],
+                "interrupt": result["interrupt"],
+                "cognitive_mode": result["cognitive_mode"],
+                "brain_calls": result["brain_calls"],
+                "action": result["action"],
+                "action_roles": result["action_roles"],
+                "sleep_completed": result["sleep_completed"],
+                "survived": result["survived"],
+                "social_engagement": result["social_engagement"],
+                "requests": report.requests,
+                "deadline_misses": report.deadline_misses,
+                "decision_ms_p95": report.decision_ms_p95,
+                "trace_digest": report.trace_digest,
+            }
+        )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / "bedroom_1.suite.json"
+    path.write_text(json.dumps({"version": __version__, "cases": rows}, indent=2), encoding="utf-8")
+    print(f"GameAgentWorkload {__version__} Bedroom-1 suite")
+    for row in rows:
+        print(
+            f"{row['case']:<16} pass={str(row['passed']):<5} "
+            f"mode={row['cognitive_mode']:<10} brain_calls={row['brain_calls']} "
+            f"p95={row['decision_ms_p95']:.1f}ms"
+        )
+    print(f"Suite JSON: {path}")
+    return path
+
+
+
+def run_bedroom_semantic_real(
+    *,
+    base_url: str,
+    model: str,
+    out_dir: Path,
+    case_names: list[str],
+    runs: int,
+    max_tokens: int,
+    timeout: float,
+) -> tuple[Path, Path]:
+    client = LlamaCppBackend(
+        base_url=base_url,
+        model=model,
+        max_concurrency=1,
+        timeout_seconds=timeout,
+    )
+    health = client.health()
+    backend = LlamaCppSemanticDecisionBackend(client)
+    cases = core_cases()
+
+    unknown = [name for name in case_names if name not in cases]
+    if unknown:
+        raise ValueError(f"Unknown Bedroom-1 case(s): {', '.join(unknown)}")
+
+    results = []
+    prompts: dict[str, str] = {}
+    for run_index in range(1, runs + 1):
+        for name in case_names:
+            result, prompt = run_semantic_case(
+                cases[name],
+                backend,
+                run_index=run_index,
+                max_tokens=max_tokens,
+            )
+            results.append(result)
+            if prompt is not None:
+                prompts[name] = prompt
+            print(
+                f"{name:<16} run={run_index:<2} mode={result.oracle_mode:<10} "
+                f"action={str(result.action):<24} semantic={str(result.semantic_pass):<5} "
+                f"realtime={str(result.realtime_pass):<5} "
+                f"wall={result.wall_ms:.1f}ms ttft={result.ttft_ms:.1f}ms"
+            )
+
+    json_path, csv_path = write_semantic_report(
+        results,
+        prompts,
+        out_dir=out_dir,
+        model=model,
+        backend_name=f"llama.cpp@{base_url}",
+        health=health,
+    )
+    print(f"Semantic JSON: {json_path}")
+    print(f"Semantic CSV:  {csv_path}")
+    return json_path, csv_path
+
+
+def run_bedroom_direct_real(
+    *,
+    base_url: str,
+    model: str,
+    out_dir: Path,
+    case_names: list[str],
+    runs: int,
+    max_tokens: int,
+    timeout: float,
+    concurrency: int,
+    warmup_runs: int,
+    warmup_case: str,
+) -> tuple[Path, Path]:
+    """Run the always-on direct-SLM crossover experiment.
+
+    Unlike bedroom-real, this path does not call the engineered/oracle
+    CognitiveInterruptGate or CognitiveBudgetController before inference.
+    The small model receives a structured AgentControlState and must return
+    one executable action id or ESCALATE.
+    """
+
+    cases = core_cases()
+    unknown = [name for name in case_names if name not in cases]
+    if unknown:
+        raise ValueError(f"Unknown Bedroom-1 case(s): {', '.join(unknown)}")
+    if warmup_case not in cases:
+        raise ValueError(f"Unknown Bedroom-1 warmup case: {warmup_case}")
+
+    probe_client = LlamaCppBackend(
+        base_url=base_url,
+        model=model,
+        max_concurrency=1,
+        timeout_seconds=timeout,
+    )
+    health = probe_client.health()
+
+    def one(name: str, run_index: int):
+        client = LlamaCppBackend(
+            base_url=base_url,
+            model=model,
+            max_concurrency=1,
+            timeout_seconds=timeout,
+        )
+        backend = LlamaCppSemanticDecisionBackend(client)
+        return run_direct_control_case(
+            cases[name],
+            backend,
+            run_index=run_index,
+            max_tokens=max_tokens,
+        )
+
+    # Warm hardware/runtime without silently contaminating the measured rows.
+    # The chosen warmup case is reported so exact-prompt reuse is auditable.
+    for i in range(warmup_runs):
+        result, _ = one(warmup_case, -(i + 1))
+        print(
+            f"warmup:{warmup_case:<9} run={i + 1:<2} "
+            f"decision={str(result.action or ('ESCALATE' if result.escalated else None)):<24} "
+            f"wall={result.wall_ms:.1f}ms ttft={result.ttft_ms:.1f}ms"
+        )
+
+    jobs = [(run_index, name) for run_index in range(1, runs + 1) for name in case_names]
+    indexed_results: dict[tuple[int, str], tuple[object, str]] = {}
+
+    if concurrency == 1:
+        for run_index, name in jobs:
+            indexed_results[(run_index, name)] = one(name, run_index)
+    else:
+        with ThreadPoolExecutor(max_workers=concurrency) as pool:
+            future_map = {
+                pool.submit(one, name, run_index): (run_index, name)
+                for run_index, name in jobs
+            }
+            for future in as_completed(future_map):
+                key = future_map[future]
+                indexed_results[key] = future.result()
+
+    results = []
+    prompts: dict[str, str] = {}
+    for run_index, name in jobs:
+        result, prompt = indexed_results[(run_index, name)]
+        results.append(result)
+        prompts[name] = prompt
+        decision = result.action or ("ESCALATE" if result.escalated else None)
+        print(
+            f"{name:<16} run={run_index:<2} kind={result.decision_kind:<8} "
+            f"decision={str(decision):<24} local={str(result.local_resolution_pass):<5} "
+            f"realtime={str(result.realtime_pass):<5} "
+            f"wall={result.wall_ms:.1f}ms ttft={result.ttft_ms:.1f}ms"
+        )
+
+    json_path, csv_path = write_direct_control_report(
+        results,
+        prompts,
+        out_dir=out_dir,
+        model=model,
+        backend_name=f"llama.cpp@{base_url}",
+        health=health,
+        concurrency=concurrency,
+        warmup_runs=warmup_runs,
+        warmup_case=warmup_case if warmup_runs else None,
+    )
+    print(f"Direct JSON: {json_path}")
+    print(f"Direct CSV:  {csv_path}")
+    return json_path, csv_path
+
+
+def run_bedroom_gate_semantic_real(
+    *,
+    base_url: str,
+    model: str,
+    out_dir: Path,
+    case_names: list[str],
+    runs: int,
+    max_tokens: int,
+    timeout: float,
+) -> tuple[Path, Path]:
+    client = LlamaCppBackend(
+        base_url=base_url,
+        model=model,
+        max_concurrency=1,
+        timeout_seconds=timeout,
+    )
+    health = client.health()
+    backend = LlamaCppSemanticDecisionBackend(client)
+    cases = core_cases()
+
+    unknown = [name for name in case_names if name not in cases]
+    if unknown:
+        raise ValueError(f"Unknown Bedroom-1 case(s): {', '.join(unknown)}")
+
+    results = []
+    prompts: dict[str, str] = {}
+    for run_index in range(1, runs + 1):
+        for name in case_names:
+            result, prompt = run_semantic_gate_case(
+                cases[name],
+                backend,
+                run_index=run_index,
+                max_tokens=max_tokens,
+            )
+            results.append(result)
+            if prompt is not None:
+                prompts[name] = prompt
+            print(
+                f"{name:<16} run={run_index:<2} "
+                f"expected={'|'.join(result.expected_modes):<12} "
+                f"predicted={str(result.predicted_mode):<10} "
+                f"pass={str(result.gate_pass):<5} "
+                f"wall={result.wall_ms:.1f}ms ttft={result.ttft_ms:.1f}ms"
+            )
+
+    json_path, csv_path = write_semantic_gate_report(
+        results,
+        prompts,
+        out_dir=out_dir,
+        model=model,
+        backend_name=f"llama.cpp@{base_url}",
+        health=health,
+    )
+    print(f"Gate JSON: {json_path}")
+    print(f"Gate CSV:  {csv_path}")
+    return json_path, csv_path
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="GameAgentWorkload 0.4-alpha research benchmark harness")
+    parser = argparse.ArgumentParser(description=f"GameAgentWorkload {__version__} research benchmark harness")
     sub = parser.add_subparsers(dest="command")
 
     run_p = sub.add_parser("run", help="run a deterministic synthetic benchmark scenario")
@@ -119,6 +396,62 @@ def main() -> None:
     sweep_p.add_argument("--concurrency", default="1,2,3,4,8,16,24,32")
     sweep_p.add_argument("--out", type=Path, default=Path("traces/sweep"))
     sweep_p.add_argument("--no-cognitive-loop", action="store_true")
+
+    bedroom_p = sub.add_parser("bedroom-suite", help="run all Bedroom-1 core cases")
+    bedroom_p.add_argument("--seed", type=int, default=7)
+    bedroom_p.add_argument("--concurrency", type=int, default=1)
+    bedroom_p.add_argument("--out", type=Path, default=Path("traces/bedroom_1"))
+
+    semantic_p = sub.add_parser(
+        "bedroom-real",
+        help="run Bedroom-1 semantic action choices against a real llama.cpp model",
+    )
+    semantic_p.add_argument("--base-url", default="http://127.0.0.1:8080")
+    semantic_p.add_argument("--model", default="local-model")
+    semantic_p.add_argument(
+        "--cases",
+        default="roach,projectile,complex_visitor",
+        help="comma-separated Bedroom-1 case names; use normal to include the no-model control",
+    )
+    semantic_p.add_argument("--runs", type=int, default=1)
+    semantic_p.add_argument("--max-tokens", type=int, default=16)
+    semantic_p.add_argument("--timeout", type=float, default=120.0)
+    semantic_p.add_argument("--out", type=Path, default=Path("traces/bedroom_1_real"))
+
+    direct_p = sub.add_parser(
+        "bedroom-direct-real",
+        help="run Bedroom-1 always-on direct-SLM control without the oracle gate/budget controller",
+    )
+    direct_p.add_argument("--base-url", default="http://127.0.0.1:8080")
+    direct_p.add_argument("--model", default="local-model")
+    direct_p.add_argument(
+        "--cases",
+        default="normal,roach,projectile,complex_visitor",
+        help="comma-separated Bedroom-1 core case names",
+    )
+    direct_p.add_argument("--runs", type=int, default=1)
+    direct_p.add_argument("--max-tokens", type=int, default=8)
+    direct_p.add_argument("--concurrency", type=int, default=1)
+    direct_p.add_argument("--warmup", type=int, default=0, help="discarded warmup requests before measurement")
+    direct_p.add_argument("--warmup-case", default="roach", help="Bedroom-1 case used for warmup requests")
+    direct_p.add_argument("--timeout", type=float, default=120.0)
+    direct_p.add_argument("--out", type=Path, default=Path("traces/bedroom_1_direct_real"))
+
+    gate_p = sub.add_parser(
+        "bedroom-gate-real",
+        help="probe Bedroom-1 interrupt/cognition-mode classification with a real llama.cpp model",
+    )
+    gate_p.add_argument("--base-url", default="http://127.0.0.1:8080")
+    gate_p.add_argument("--model", default="local-model")
+    gate_p.add_argument(
+        "--cases",
+        default="normal,roach,projectile,complex_visitor",
+        help="comma-separated Bedroom-1 core case names",
+    )
+    gate_p.add_argument("--runs", type=int, default=1)
+    gate_p.add_argument("--max-tokens", type=int, default=8)
+    gate_p.add_argument("--timeout", type=float, default=120.0)
+    gate_p.add_argument("--out", type=Path, default=Path("traces/bedroom_1_gate_real"))
 
     replay_p = sub.add_parser("replay", help="inspect the canonical request-stream digest")
     replay_p.add_argument("trace", type=Path)
@@ -170,6 +503,67 @@ def main() -> None:
             values,
             cognitive_loop=not args.no_cognitive_loop,
         )
+    elif args.command == "bedroom-suite":
+        run_bedroom_suite(args.seed, args.out, args.concurrency)
+    elif args.command == "bedroom-real":
+        case_names = [x.strip() for x in args.cases.split(",") if x.strip()]
+        if not case_names:
+            raise SystemExit("--cases must contain at least one Bedroom-1 case")
+        if args.runs < 1:
+            raise SystemExit("--runs must be >= 1")
+        if args.max_tokens < 1:
+            raise SystemExit("--max-tokens must be >= 1")
+        run_bedroom_semantic_real(
+            base_url=args.base_url,
+            model=args.model,
+            out_dir=args.out,
+            case_names=case_names,
+            runs=args.runs,
+            max_tokens=args.max_tokens,
+            timeout=args.timeout,
+        )
+    elif args.command == "bedroom-direct-real":
+        case_names = [x.strip() for x in args.cases.split(",") if x.strip()]
+        if not case_names:
+            raise SystemExit("--cases must contain at least one Bedroom-1 case")
+        if args.runs < 1:
+            raise SystemExit("--runs must be >= 1")
+        if args.max_tokens < 1:
+            raise SystemExit("--max-tokens must be >= 1")
+        if args.concurrency < 1:
+            raise SystemExit("--concurrency must be >= 1")
+        if args.warmup < 0:
+            raise SystemExit("--warmup must be >= 0")
+        run_bedroom_direct_real(
+            base_url=args.base_url,
+            model=args.model,
+            out_dir=args.out,
+            case_names=case_names,
+            runs=args.runs,
+            max_tokens=args.max_tokens,
+            timeout=args.timeout,
+            concurrency=args.concurrency,
+            warmup_runs=args.warmup,
+            warmup_case=args.warmup_case,
+        )
+    elif args.command == "bedroom-gate-real":
+        case_names = [x.strip() for x in args.cases.split(",") if x.strip()]
+        if not case_names:
+            raise SystemExit("--cases must contain at least one Bedroom-1 case")
+        if args.runs < 1:
+            raise SystemExit("--runs must be >= 1")
+        if args.max_tokens < 1:
+            raise SystemExit("--max-tokens must be >= 1")
+        run_bedroom_gate_semantic_real(
+            base_url=args.base_url,
+            model=args.model,
+            out_dir=args.out,
+            case_names=case_names,
+            runs=args.runs,
+            max_tokens=args.max_tokens,
+            timeout=args.timeout,
+        )
+
     elif args.command == "replay":
         print(request_digest_from_trace(args.trace))
     elif args.command == "llamacpp-probe":

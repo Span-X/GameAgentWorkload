@@ -96,7 +96,7 @@ def core_cases() -> dict[str, BedroomCase]:
             envelope=BehavioralEnvelope(
                 expected_interrupt=True,
                 acceptable_modes=(CognitiveMode.FAST,),
-                required_action_roles=("restore_precondition",),
+                required_action_roles=("restore_precondition", "inspect"),
                 require_sleep_completed=True,
                 max_brain_calls=1,
             ),

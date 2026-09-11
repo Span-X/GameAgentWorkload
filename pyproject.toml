@@ -1,6 +1,6 @@
 [project]
 name = "game-agent-workload"
-version = "0.5.0a1"
+version = "0.5.0a5"
 description = "Experimental workload and benchmark harness for persistent real-time AI agents in games"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,8 +17,9 @@ classifiers = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
-[tool.setuptools.packages.find]
-include = ["awb*"]
-
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["awb*", "scenarios*"]

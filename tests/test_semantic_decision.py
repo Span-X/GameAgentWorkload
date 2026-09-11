@@ -59,13 +59,15 @@ def test_parser_accepts_exact_and_tiny_json_but_not_unknown_action():
 def test_real_semantic_path_uses_model_choice_not_reference_policy():
     # The reference policy would choose clear_sleep_surface. The stub model
     # deliberately chooses inspect_change, proving this path evaluates the
-    # backend's semantic choice rather than silently falling back.
+    # backend's semantic choice rather than silently falling back. Bedroom-1's
+    # behavioral envelope now accepts inspection as a reasonable immediate next
+    # action when the entity classification is not perfectly certain.
     backend = StubSemanticBackend("inspect_change")
     result, _ = run_semantic_case(core_cases()["roach"], backend)
     assert backend.calls == 1
     assert result.action == "inspect_change"
-    assert result.semantic_pass is False
-    assert result.realtime_pass is False
+    assert result.semantic_pass is True
+    assert result.realtime_pass is True
 
 
 def test_projectile_correct_action_can_still_fail_real_time_deadline():
